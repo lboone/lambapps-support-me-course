@@ -38,6 +38,7 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
 
 const formSchema = z
   .object({
@@ -194,7 +195,12 @@ export default function SignUpPage() {
                             variant="outline"
                             className="normal-case flex justify-between pr-1"
                           >
-                            <span>Pick a date</span>
+                            {!!field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+
                             <CalendarIcon />
                           </Button>
                         </FormControl>
