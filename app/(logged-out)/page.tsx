@@ -1,14 +1,12 @@
 import { Button } from "@/components/ui/button";
-import { PersonStandingIcon } from "lucide-react";
+import SiteLogo from "@/components/ui/site-logo";
 import Link from "next/link";
 
 export default function LandingPage() {
   return (
     <>
-      <h1 className="flex gap-2 items-center">
-        <PersonStandingIcon size={50} className="text-pink-500" /> Support Me
-      </h1>
-      <p>The best dashboardto manager customer support</p>
+      <SiteLogo />
+      <p>The best dashboard to manager customer support</p>
       <div className="flex items-center justify-center gap-2">
         <Button asChild>
           <Link href="/login">Log in</Link>

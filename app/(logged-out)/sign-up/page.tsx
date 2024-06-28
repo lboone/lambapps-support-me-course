@@ -17,6 +17,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import SiteLogo from "@/components/ui/site-logo";
 
@@ -30,18 +37,19 @@ const formSchema = z.object({
     .string()
     .min(1, { message: "Email is required" })
     .email({ message: "Invalid email" }),
-  password: z
-    .string()
-    .min(1, { message: "Password is required" })
-    .min(8, { message: "Password must be at least 8 characters" }),
+  accountType: z.enum(["personal", "company"]),
+  companyName: z.string().optional(),
+  numberOfEmployees: z.coerce.number().optional(),
 });
 
-export default function LoginPage() {
+export default function SignUpPage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
-      password: "",
+      accountType: "personal",
+      companyName: "",
+      numberOfEmployees: 0,
     },
   });
 
@@ -53,8 +61,8 @@ export default function LoginPage() {
       <SiteLogo />
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle>Login</CardTitle>
-          <CardDescription>Login to your SupportMe account</CardDescription>
+          <CardTitle>Sign up</CardTitle>
+          <CardDescription>Sign up for a new SupportMe account</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -81,29 +89,33 @@ export default function LoginPage() {
               />
               <FormField
                 control={form.control}
-                name="password"
+                name="accountType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel>Account Type</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="********"
-                        type="password"
-                        {...field}
-                      />
+                      <Select onValueChange={field.onChange}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select an account type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="personal">Personal</SelectItem>
+                          <SelectItem value="company">Company</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <Button type="submit">Login</Button>
+              <Button type="submit">Sign up</Button>
             </form>
           </Form>
         </CardContent>
         <CardFooter className="justify-between border-t border-muted pt-4">
-          <small>Don't have an account?</small>
+          <small>Already have an account?</small>
           <Button asChild variant="outline" size="sm">
-            <Link href="/sign-up">Sign up</Link>
+            <Link href="/login">Login</Link>
           </Button>
         </CardFooter>
       </Card>
