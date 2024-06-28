@@ -32,15 +32,35 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
-const formSchema = z.object({
-  email: z
-    .string()
-    .min(1, { message: "Email is required" })
-    .email({ message: "Invalid email" }),
-  accountType: z.enum(["personal", "company"]),
-  companyName: z.string().optional(),
-  numberOfEmployees: z.coerce.number().optional(),
-});
+const formSchema = z
+  .object({
+    email: z
+      .string()
+      .min(1, { message: "Email is required" })
+      .email({ message: "Invalid email" }),
+    accountType: z.enum(["personal", "company"]),
+    companyName: z.string().optional(),
+    numberOfEmployees: z.coerce.number().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.accountType === "company" && !data.companyName) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["companyName"],
+        message: "Company name is required",
+      });
+    }
+    if (
+      data.accountType === "company" &&
+      (!data.numberOfEmployees || data.numberOfEmployees! < 1)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["numberOfEmployees"],
+        message: "Number of employees is required",
+      });
+    }
+  });
 
 export default function SignUpPage() {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -56,6 +76,9 @@ export default function SignUpPage() {
   const handleSubmit = () => {
     console.log("Login validation passed");
   };
+
+  const accountType = form.watch("accountType");
+
   return (
     <>
       <SiteLogo />
@@ -93,21 +116,56 @@ export default function SignUpPage() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Account Type</FormLabel>
-                    <FormControl>
-                      <Select onValueChange={field.onChange}>
+                    <Select onValueChange={field.onChange}>
+                      <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select an account type" />
                         </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="personal">Personal</SelectItem>
-                          <SelectItem value="company">Company</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="personal">Personal</SelectItem>
+                        <SelectItem value="company">Company</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+              {accountType === "company" && (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="companyName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Company Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Your company name" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="numberOfEmployees"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Employees</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Employees"
+                            type="number"
+                            min={0}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </>
+              )}
               <Button type="submit">Sign up</Button>
             </form>
           </Form>
