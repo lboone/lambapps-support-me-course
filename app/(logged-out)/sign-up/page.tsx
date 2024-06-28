@@ -24,6 +24,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
 import SiteLogo from "@/components/ui/site-logo";
 
@@ -31,6 +37,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import { CalendarIcon } from "lucide-react";
 
 const formSchema = z
   .object({
@@ -41,6 +48,15 @@ const formSchema = z
     accountType: z.enum(["personal", "company"]),
     companyName: z.string().optional(),
     numberOfEmployees: z.coerce.number().optional(),
+    dob: z.date().refine((date) => {
+      const today = new Date();
+      const eighteenYearsAgo = new Date(
+        today.getFullYear() - 18,
+        today.getMonth(),
+        today.getDate()
+      );
+      return date.getTime() <= eighteenYearsAgo.getTime();
+    }, "You must be at least 18 years old"),
   })
   .superRefine((data, ctx) => {
     if (data.accountType === "company" && !data.companyName) {
@@ -67,9 +83,6 @@ export default function SignUpPage() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
-      accountType: "personal",
-      companyName: "",
-      numberOfEmployees: 0,
     },
   });
 
@@ -78,7 +91,9 @@ export default function SignUpPage() {
   };
 
   const accountType = form.watch("accountType");
+  const dobFromDate = new Date();
 
+  dobFromDate.setFullYear(dobFromDate.getFullYear() - 120);
   return (
     <>
       <SiteLogo />
@@ -166,6 +181,42 @@ export default function SignUpPage() {
                   />
                 </>
               )}
+              <FormField
+                control={form.control}
+                name="dob"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col pt-2">
+                    <FormLabel>Date of birth</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            className="normal-case flex justify-between pr-1"
+                          >
+                            <span>Pick a date</span>
+                            <CalendarIcon />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent align="start" className="w-auto p-0">
+                        <Calendar
+                          mode="single"
+                          defaultMonth={field.value}
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          fixedWeeks={true}
+                          weekStartsOn={1}
+                          fromDate={dobFromDate}
+                          toDate={new Date()}
+                          captionLayout="dropdown-buttons"
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <Button type="submit">Sign up</Button>
             </form>
           </Form>
