@@ -39,25 +39,29 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
+import { PasswordInput } from "@/components/ui/password-input";
 
-const formSchema = z
+const baseSchema = z.object({
+  email: z
+    .string()
+    .min(1, { message: "Email is required" })
+    .email({ message: "Invalid email" }),
+  dob: z.date().refine((date) => {
+    const today = new Date();
+    const eighteenYearsAgo = new Date(
+      today.getFullYear() - 18,
+      today.getMonth(),
+      today.getDate()
+    );
+    return date.getTime() <= eighteenYearsAgo.getTime();
+  }, "You must be at least 18 years old"),
+});
+
+const accountTypeSchema = z
   .object({
-    email: z
-      .string()
-      .min(1, { message: "Email is required" })
-      .email({ message: "Invalid email" }),
     accountType: z.enum(["personal", "company"]),
     companyName: z.string().optional(),
     numberOfEmployees: z.coerce.number().optional(),
-    dob: z.date().refine((date) => {
-      const today = new Date();
-      const eighteenYearsAgo = new Date(
-        today.getFullYear() - 18,
-        today.getMonth(),
-        today.getDate()
-      );
-      return date.getTime() <= eighteenYearsAgo.getTime();
-    }, "You must be at least 18 years old"),
   })
   .superRefine((data, ctx) => {
     if (data.accountType === "company" && !data.companyName) {
@@ -78,6 +82,31 @@ const formSchema = z
       });
     }
   });
+
+const passwordSchema = z
+  .object({
+    password: z
+      .string()
+      .min(8, { message: "Password must be at least 8 characters" })
+      .refine((password) => {
+        // must contain at least one special character and one uppercase character and
+        return /^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,}$/.test(
+          password
+        ); // eslint-disable-line
+      }, "Password must contain at least 1 special character and 1 uppercase character"),
+    passwordConfirm: z.string(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.password !== data.passwordConfirm) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["passwordConfirm"],
+        message: "Passwords do not match",
+      });
+    }
+  });
+
+const formSchema = baseSchema.and(accountTypeSchema).and(passwordSchema);
 
 export default function SignUpPage() {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -109,6 +138,7 @@ export default function SignUpPage() {
               onSubmit={form.handleSubmit(handleSubmit)}
               className="flex flex-col gap-4"
             >
+              {/* Email Field */}
               <FormField
                 control={form.control}
                 name="email"
@@ -126,6 +156,8 @@ export default function SignUpPage() {
                   </FormItem>
                 )}
               />
+
+              {/* Account Type Field */}
               <FormField
                 control={form.control}
                 name="accountType"
@@ -182,6 +214,8 @@ export default function SignUpPage() {
                   />
                 </>
               )}
+
+              {/* Date of Birth Field */}
               <FormField
                 control={form.control}
                 name="dob"
@@ -219,6 +253,44 @@ export default function SignUpPage() {
                         />
                       </PopoverContent>
                     </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Password Field */}
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <PasswordInput
+                        placeholder="••••••••"
+                        type="password"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Password Confirm Field */}
+              <FormField
+                control={form.control}
+                name="passwordConfirm"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Confirm Password</FormLabel>
+                    <FormControl>
+                      <PasswordInput
+                        placeholder="••••••••"
+                        type="password"
+                        {...field}
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}

@@ -18,6 +18,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import SiteLogo from "@/components/ui/site-logo";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -62,6 +63,7 @@ export default function LoginPage() {
               onSubmit={form.handleSubmit(handleSubmit)}
               className="flex flex-col gap-4"
             >
+              {/* Email Field */}
               <FormField
                 control={form.control}
                 name="email"
@@ -79,6 +81,8 @@ export default function LoginPage() {
                   </FormItem>
                 )}
               />
+
+              {/* Password Field */}
               <FormField
                 control={form.control}
                 name="password"
@@ -86,7 +90,7 @@ export default function LoginPage() {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input
+                      <PasswordInput
                         placeholder="********"
                         type="password"
                         {...field}
