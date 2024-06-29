@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import SiteLogo from "@/components/ui/site-logo";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -55,6 +56,9 @@ const baseSchema = z.object({
     );
     return date.getTime() <= eighteenYearsAgo.getTime();
   }, "You must be at least 18 years old"),
+  acceptTerms: z.boolean({
+    required_error: "You must accept the terms and conditions",
+  }),
 });
 
 const accountTypeSchema = z
@@ -266,11 +270,7 @@ export default function SignUpPage() {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <PasswordInput
-                        placeholder="••••••••"
-                        type="password"
-                        {...field}
-                      />
+                      <PasswordInput placeholder="••••••••" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -285,16 +285,46 @@ export default function SignUpPage() {
                   <FormItem>
                     <FormLabel>Confirm Password</FormLabel>
                     <FormControl>
-                      <PasswordInput
-                        placeholder="••••••••"
-                        type="password"
-                        {...field}
-                      />
+                      <PasswordInput placeholder="••••••••" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
+              {/* Terms and Conditions */}
+              <FormField
+                control={form.control}
+                name="acceptTerms"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-center gap-2">
+                      <FormControl>
+                        <Checkbox
+                          id="acceptTerms"
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <FormLabel htmlFor="acceptTerms">
+                        I accept the terms and conditions
+                      </FormLabel>
+                    </div>
+                    <FormDescription>
+                      By signing up you agree to our{" "}
+                      <Link
+                        href="/terms-and-conditions"
+                        className="hover:underline text-primary"
+                      >
+                        Terms and Conditions
+                      </Link>
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Submit Button */}
               <Button type="submit">Sign up</Button>
             </form>
           </Form>
