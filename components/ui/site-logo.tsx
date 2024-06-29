@@ -11,7 +11,7 @@ interface SiteLogoProps {
 const SiteLogo = ({
   className,
   title = "Support.Me",
-  children = <PersonStandingIcon size={50} className="text-pink-500" />,
+  children = <PersonStandingIcon size={50} className="text-primary" />,
 }: SiteLogoProps) => {
   return (
     <Link href="/">
