@@ -15,7 +15,7 @@ const SiteLogo = ({
 }: SiteLogoProps) => {
   return (
     <Link href="/">
-      <h1 className={cn("flex gap-2 items-center", className)}>
+      <h1 className={cn("flex gap-1 items-center", className)}>
         {children} {title}
       </h1>
     </Link>
