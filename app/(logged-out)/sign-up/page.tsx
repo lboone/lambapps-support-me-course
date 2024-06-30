@@ -41,6 +41,7 @@ import * as z from "zod";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { PasswordInput } from "@/components/ui/password-input";
+import { useRouter } from "next/navigation";
 
 const baseSchema = z.object({
   email: z
@@ -56,9 +57,6 @@ const baseSchema = z.object({
     );
     return date.getTime() <= eighteenYearsAgo.getTime();
   }, "You must be at least 18 years old"),
-  acceptTerms: z.boolean({
-    required_error: "You must accept the terms and conditions",
-  }),
 });
 
 const accountTypeSchema = z
@@ -110,18 +108,35 @@ const passwordSchema = z
     }
   });
 
-const formSchema = baseSchema.and(accountTypeSchema).and(passwordSchema);
+const acceptTermsSchema = z.object({
+  acceptTerms: z
+    .boolean({
+      required_error: "You must accept the terms and conditions",
+    })
+    .refine((checked) => checked, "You must accept the terms and conditions"),
+});
+
+const formSchema = baseSchema
+  .and(accountTypeSchema)
+  .and(passwordSchema)
+  .and(acceptTermsSchema);
 
 export default function SignUpPage() {
+  const router = useRouter();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
+      password: "",
+      passwordConfirm: "",
+      companyName: "",
     },
   });
 
-  const handleSubmit = () => {
-    console.log("Login validation passed");
+  const handleSubmit = (values: z.infer<typeof formSchema>) => {
+    console.log({ values });
+    router.push("/login");
   };
 
   const accountType = form.watch("accountType");
@@ -210,6 +225,7 @@ export default function SignUpPage() {
                             type="number"
                             min={0}
                             {...field}
+                            value={field.value ?? ""}
                           />
                         </FormControl>
                         <FormMessage />
