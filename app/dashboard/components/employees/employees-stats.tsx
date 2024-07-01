@@ -1,5 +1,5 @@
 import React from "react";
-import EmployeesStatsCard from "./employees-stats-card";
+import StatsCard from "../stats-card";
 import {
   AlertTriangleIcon,
   BadgeCheckIcon,
@@ -114,7 +114,7 @@ const EmployeesStats = () => {
     <>
       <div className="grid lg:grid-cols-3 gap-4">
         {employeesStatsData.map((card, index) => (
-          <EmployeesStatsCard
+          <StatsCard
             key={index}
             title={card.title}
             footer={card?.footer}
@@ -123,7 +123,7 @@ const EmployeesStats = () => {
             footerClassName={card?.footerClassName}
           >
             {card.children}
-          </EmployeesStatsCard>
+          </StatsCard>
         ))}
       </div>
       <Card className="my-4">

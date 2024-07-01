@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 
 interface Props {
   title: string;
+  titleIcon?: React.ReactNode;
   children: React.ReactNode;
   footer?: React.ReactNode;
   className?: string;
@@ -18,8 +19,9 @@ interface Props {
   footerClassName?: string;
 }
 
-const EmployeesStatsCard = ({
+const StatsCard = ({
   title,
+  titleIcon,
   children,
   footer,
   className,
@@ -28,12 +30,17 @@ const EmployeesStatsCard = ({
   contentClassName,
   footerClassName,
 }: Props) => {
-  console.log({ footerClassName });
   return (
     <Card className={cn("", className)}>
       <CardHeader className={cn("pb-2", headerClassName)}>
-        <CardTitle className={cn("text-base", cardTitleClassName)}>
+        <CardTitle
+          className={cn(
+            "text-base flex items-center justify-between",
+            cardTitleClassName
+          )}
+        >
           {title}
+          {titleIcon && titleIcon}
         </CardTitle>
       </CardHeader>
       <CardContent className={cn("", contentClassName)}>{children}</CardContent>
@@ -44,4 +51,4 @@ const EmployeesStatsCard = ({
   );
 };
 
-export default EmployeesStatsCard;
+export default StatsCard;
