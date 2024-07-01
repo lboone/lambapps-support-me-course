@@ -3,6 +3,7 @@ import EmployeesStatsCard from "./employees-stats-card";
 import {
   AlertTriangleIcon,
   BadgeCheckIcon,
+  LaptopIcon,
   PartyPopperIcon,
   UserCheck2Icon,
   UserIcon,
@@ -14,6 +15,8 @@ import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import Image from "next/image";
 import cm from "@/public/images/cm.jpg";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import WorkLocationTrends from "./work-location-trends";
 
 const totalEmployees = 100;
 const employeesPresent = 80;
@@ -83,7 +86,7 @@ const employeesStatsData = [
   },
   {
     title: "Employee of the month",
-    className: "border-pink-500 flex flex-col ",
+    className: "border-primary flex flex-col ",
     headerClassName: undefined,
     cardTitleClassName: undefined,
     footerClassName:
@@ -108,20 +111,33 @@ const employeesStatsData = [
 ];
 const EmployeesStats = () => {
   return (
-    <div className="grid lg:grid-cols-3 gap-4">
-      {employeesStatsData.map((card, index) => (
-        <EmployeesStatsCard
-          key={index}
-          title={card.title}
-          footer={card?.footer}
-          className={card?.className}
-          headerClassName={card?.headerClassName}
-          footerClassName={card?.footerClassName}
-        >
-          {card.children}
-        </EmployeesStatsCard>
-      ))}
-    </div>
+    <>
+      <div className="grid lg:grid-cols-3 gap-4">
+        {employeesStatsData.map((card, index) => (
+          <EmployeesStatsCard
+            key={index}
+            title={card.title}
+            footer={card?.footer}
+            className={card?.className}
+            headerClassName={card?.headerClassName}
+            footerClassName={card?.footerClassName}
+          >
+            {card.children}
+          </EmployeesStatsCard>
+        ))}
+      </div>
+      <Card className="my-4">
+        <CardHeader>
+          <CardTitle className="flex gap-2 items-center text-lg">
+            <LaptopIcon />
+            <span>Employee work location trends</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <WorkLocationTrends />
+        </CardContent>
+      </Card>
+    </>
   );
 };
 
